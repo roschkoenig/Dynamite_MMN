@@ -1,6 +1,7 @@
 function stimulus_indices = dyn_oddball_paradigms(paradigm, no_stimuli)
 freq_index = 1:no_stimuli;
 switch paradigm
+    
 case 'roving'
 % Roving Oddball Paradigm
 %==========================================================================

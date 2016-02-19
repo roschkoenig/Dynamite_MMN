@@ -4,7 +4,6 @@ function dynamite_roving(paradigm, tone_type, dur_exp, min_f, max_f, sub, run)
 % run - run number: 1, 2,...
 % dur_exp - duration of the experiment or run in minutes: 15
 
-sub
 % General Housekeeping
 %==========================================================================
 InitializePsychSound();
@@ -55,24 +54,41 @@ while currentTime < startTime + dur_exp * 60            % loop until dur_exp (mi
     
     PsychPortAudio('FillBuffer', audio_handle, stimulus);           % read stimulus into audio buffer
     currentTime = PsychPortAudio('Start', audio_handle, 1, 0, 1);   % play buffered stimulus (returns time stamp)
-    lptwrite(888, presentation_count);
+
+    % Setting tested for GOS Synamps
+    %----------------------------------------------------------------------
+    lptwrite(49144, -presentation_count-1);
+    presentation_count
+    WaitSecs(0.03);
+    lptwrite(49144, 255);
+    %----------------------------------------------------------------------
+    
     datalog = [datalog; freqd(stimulus_indices(i)) presentation_count currentTime];
     
-    if stimulus_indices(i) == stimulus_indices(i+1)             % presentation_count tracks how often a stimulus has been presented
-        presentation_count = presentation_count+1;              % add one if the next is the same stimulus
-    else    presentation_count = 1;  end;
- 	
-    jitter = 0.05 * (rand-.5); 
-    
-    if strcmp(paradigm, 'aaaaB'),   
-        WaitSecs(0.1 + jitter);      
-        if rem(i,5)==0, WaitSecs(0.7 + jitter); end
+    if strcmp(paradigm, 'aaaaB'),     
+        if rem(i,5) == 4      
+            WaitSecs(0.1);
+            if stimulus_indices(i)~= stimulus_indices(i+1)
+                presentation_count = 99;
+            else presentation_count = presentation_count+1; 
+            end
+            
+        elseif rem(i,5)==0 
+            WaitSecs(0.7); 
+            presentation_count = 1; 
+
+        else
+            presentation_count = presentation_count+1;
+            WaitSecs(0.1);   
+        end
     else
-        WaitSecs(0.4); 
-    end
-    
-    lptwrite(888, 0);
-    
+        WaitSecs(0.4);
+        if stimulus_indices(i) == stimulus_indices(i+1)             % presentation_count tracks how often a stimulus has been presented
+            presentation_count = presentation_count+1;              % add one if the next is the same stimulus
+        else    presentation_count = 1;  
+        end; 
+  
+    end   
 end;
 
 PsychPortAudio('Stop',audio_handle);
