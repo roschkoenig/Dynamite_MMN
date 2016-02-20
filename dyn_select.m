@@ -26,15 +26,14 @@ function dyn_select_OpeningFcn(hObject, eventdata, handles, varargin)
 % General Housekeeping
 %==========================================================================
 InitializePsychSound();
-
+global folder
+folder = uigetdir([pwd filesep '..'], 'Please select base folder');
 
 % Manual definitions
 %--------------------------------------------------------------------------
 sub         = 'dummy';   % Subject ID
 run         = 1;        % Run Number
 dur_exp     = 1;        % Duration of Experiment in minutes
-
-folder      = 'C:\Users\rrosch\Dropbox\Research\Friston Lab\1510 Dynamite\Paradigms';
 addpath(genpath(folder));
 
 min_f       = 500;
@@ -167,15 +166,16 @@ end
 
 %% Run Experiment Button
 function run_experiment_Callback(hObject, eventdata, handles)
+global folder
 min_f = get(handles.min_freq, 'UserData');
 max_f = get(handles.max_freq, 'UserData');
 paradigm = get(handles.paradigm_selection, 'UserData');
 dur_exp = get(handles.duration, 'UserData');
 tone_type = get(handles.tone_type, 'UserData');
-sub = get(handles.participantID, 'UserData')
+sub = get(handles.participantID, 'UserData');
 run = get(handles.run_no, 'UserData');
 
-dynamite_roving(paradigm, tone_type, dur_exp, min_f, max_f, sub, run);
+dynamite_roving(paradigm, tone_type, dur_exp, min_f, max_f, sub, run, folder);
 
 
 

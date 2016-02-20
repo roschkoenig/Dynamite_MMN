@@ -1,4 +1,4 @@
-function dynamite_roving(paradigm, tone_type, dur_exp, min_f, max_f, sub, run)
+function dynamite_roving(paradigm, tone_type, dur_exp, min_f, max_f, sub, run, folder)
 
 % sub - subject: 'patient1', 'subject1', ...
 % run - run number: 1, 2,...
@@ -10,7 +10,6 @@ InitializePsychSound();
 
 % Manual definitions
 %--------------------------------------------------------------------------
-folder      = 'C:\Users\rrosch\Dropbox\Research\Friston Lab\1510 Dynamite\Paradigms';
 addpath(genpath(folder));
 
 freq        = min_f;
@@ -57,10 +56,13 @@ while currentTime < startTime + dur_exp * 60            % loop until dur_exp (mi
 
     % Setting tested for GOS Synamps
     %----------------------------------------------------------------------
-    lptwrite(49144, -presentation_count-1);
+    if computer ~= 'MACI64';
+        lptwrite(49144, -presentation_count-1);
+        WaitSecs(0.03);
+        lptwrite(49144, 255);
+    end
+    
     presentation_count
-    WaitSecs(0.03);
-    lptwrite(49144, 255);
     %----------------------------------------------------------------------
     
     datalog = [datalog; freqd(stimulus_indices(i)) presentation_count currentTime];
@@ -94,8 +96,8 @@ end;
 PsychPortAudio('Stop',audio_handle);
 PsychPortAudio('Close',audio_handle);
 
-if ~exist([folder '/Datalogs'], 'dir')
+if ~exist([folder filesep 'Datalogs'], 'dir')
     mkdir('Datalogs');
 end;
-save([folder '\Datalogs\' sub '_' num2str(run) '_' paradigm '__' tone_type], 'datalog');
+save([folder filesep 'Datalogs' filesep sub '_' num2str(run) '_' paradigm '__' tone_type], 'datalog');
     
